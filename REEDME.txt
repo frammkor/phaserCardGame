@@ -1,0 +1,5 @@
+Project inspired by the course
+Practice Javascript in 2020: Code a Card Game in Phaser 3
+
+Fots create with BitMap Font Generator
+Some assets from OpenGameArt.org have been used. No copywrite infracitons were made.
