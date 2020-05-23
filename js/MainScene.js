@@ -1,3 +1,5 @@
+import CardBase from './CardBase.js';
+
 export default class MainScene extends Phaser.Scene {
   constructor() {
     super('MainScene');
@@ -21,5 +23,16 @@ export default class MainScene extends Phaser.Scene {
       this.load.image('shield', 'assets/images/shield.png'),
       this.load.image('troll', 'assets/images/troll.png'),
       this.load.bitmapFont('pressstart', 'assets/fonts/pressstart.png', 'assets/fonts/pressstart.fnt')
+  }
+  create() {
+    this.player = new CardBase({
+      scene: this,
+      x: 200,
+      y: 200,
+      card: 'playercard',
+      image: 'paladin',
+      depth: 1,
+      name: 'Paladin'
+    })
   }
 }
