@@ -1,4 +1,5 @@
-import CardBase from './CardBase.js';
+import CardPlayer from './CardPlayer.js';
+import Grid from './Grid.js';
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -25,14 +26,61 @@ export default class MainScene extends Phaser.Scene {
       this.load.bitmapFont('pressstart', 'assets/fonts/pressstart.png', 'assets/fonts/pressstart.fnt')
   }
   create() {
-    this.player = new CardBase({
+    this.grid = new Grid({ scene: this, columns: 3, rows: 3 });
+
+    this.player = new CardPlayer({
       scene: this,
-      x: 200,
-      y: 200,
+      x: this.game.config.width / 2,
+      y: this.game.config.height - 200,
       card: 'playercard',
       image: 'paladin',
       depth: 1,
-      name: 'Paladin'
+      name: 'Paladin',
+      health: 16,
+      ondragend: (pointer, gameObject) => {
+        // resets the player card when the mouse is realesed
+        this.player.x = this.player.originalX;
+        this.player.y = this.player.originalY;
+        if (this.highlighted) {
+          // seting this card as selected to later have distinguish animation for the other two
+          this.highlighted.selected = true;
+          switch (this.highlighted.cardtype) {
+            case 'attack':
+              this.player.attack(this.highlighted.value);
+              this.highlighted.dead = true;
+              break;
+            case 'heal':
+              this.player.health = Math.min(this.player.health + this.highlighted.value, this.player.maxHealth);
+              break;
+            case 'armor':
+              this.player.armor = this.highlighted.value;
+              break;
+          }
+          this.grid.fadeFrontRow();
+        }
+      }
     })
+  }
+
+  update(time, delta) {
+    // reset each cards highlighted status on each frame refresh
+    this.grid.cards[0].highlighted = false;
+    this.grid.cards[1].highlighted = false;
+    this.grid.cards[2].highlighted = false;
+    // reset the tracked highlighted card
+    this.highlighted = null;
+    let columnWidth = this.game.config.width / this.grid.columns;
+    if (this.player.y < 700) {
+      if (this.player.x < columnWidth) {
+        this.grid.cards[0].highlighted = true;
+        this.highlighted = this.grid.cards[0];
+      } else if (this.player.x > columnWidth * 2) {
+        this.grid.cards[2].highlighted = true;
+        this.highlighted = this.grid.cards[2];
+      } else {
+        this.grid.cards[1].highlighted = true;
+        this.highlighted = this.grid.cards[1];
+      }
+    }
   }
 }

@@ -13,4 +13,14 @@ export default class CardBase extends Phaser.GameObjects.Container {
     this.cardname = name;
     this.scene.add.existing(this);
   }
+
+  // fixing the card's name to be center bottom of it
+  set cardname(newName) {
+    this._cardname = newName;
+    this.textName.text = this._cardname;
+    this.textName.maxWidth = this.spriteCard.width; // prevents the name field from been wither than the one from the card
+    this.textName.tint = 0; // text color
+    this.textName.x = -this.textName.width / 2; // X alignment of the card name
+    this.textName.y = 120 - this.textName.height;
+  }
 }
