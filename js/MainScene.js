@@ -1,5 +1,6 @@
 import CardPlayer from './CardPlayer.js';
 import Grid from './Grid.js';
+import { AddButtonRestart } from './AddButtonRestart.js'
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -42,12 +43,14 @@ export default class MainScene extends Phaser.Scene {
         this.player.x = this.player.originalX;
         this.player.y = this.player.originalY;
         if (this.highlighted) {
+          this.player.originalX = this.player.x = this.highlighted.x;
           // seting this card as selected to later have distinguish animation for the other two
           this.highlighted.selected = true;
           switch (this.highlighted.cardtype) {
             case 'attack':
               this.player.attack(this.highlighted.value);
               this.highlighted.dead = true;
+              this.highlighted.deadAnimation();
               break;
             case 'heal':
               this.player.health = Math.min(this.player.health + this.highlighted.value, this.player.maxHealth);
@@ -56,7 +59,11 @@ export default class MainScene extends Phaser.Scene {
               this.player.armor = this.highlighted.value;
               break;
           }
-          this.grid.fadeFrontRow();
+          if (this.player.dead) {
+            AddButtonRestart(this);
+          } else {
+            this.grid.fadeFrontRow();
+          }
         }
       }
     })
@@ -70,7 +77,9 @@ export default class MainScene extends Phaser.Scene {
     // reset the tracked highlighted card
     this.highlighted = null;
     let columnWidth = this.game.config.width / this.grid.columns;
-    if (this.player.y < 700) {
+    // find out how far is the player moving
+    let xDiff = Math.abs(this.player.x - this.player.originalX);
+    if (this.player.y < 700 && xDiff < columnWidth * 1.4) {
       if (this.player.x < columnWidth) {
         this.grid.cards[0].highlighted = true;
         this.highlighted = this.grid.cards[0];

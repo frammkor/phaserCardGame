@@ -32,6 +32,12 @@ export default class Grid {
     }
   }
 
+  addBackRow() {
+    // avoiding calling this function mutiple times
+    if (this.cards.length >= this.columns * this.rows) return;
+    this.addCards(6);
+  }
+
   fadeFrontRow() {
     setTimeout(() => {
       // deleting the first three cards
@@ -41,14 +47,17 @@ export default class Grid {
         this.scene.tweens.add({
           targets: card,
           duration: 400,
-          y: card.y + this.yOffset
+          y: card.y + this.yOffset,
+          onCompleated: () => this.addBackRow()
         })
       })
     }, 1000);
 
+
+
     // fade fast the two cards that were not selected
     this.cards.slice(0, 3).forEach(card => {
-      if (!card.select) {
+      if (!card.selected) {
         this.scene.tweens.add({ targets: card, alpha: 0, duration: 200 })
       }
     })
